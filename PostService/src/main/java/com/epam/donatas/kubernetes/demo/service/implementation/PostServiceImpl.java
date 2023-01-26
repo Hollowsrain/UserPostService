@@ -6,6 +6,7 @@ import com.epam.donatas.kubernetes.demo.model.Post;
 import com.epam.donatas.kubernetes.demo.model.User;
 import com.epam.donatas.kubernetes.demo.repository.PostRepository;
 import com.epam.donatas.kubernetes.demo.service.PostService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,7 +20,9 @@ import java.util.Optional;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final String BASE_URL = "http://user-service:8080/users/";
+
+    @Value("${USER_SERVICE_URL}")
+    private String BASE_URL;
 
     public PostServiceImpl(PostRepository repository) {
         this.postRepository = repository;

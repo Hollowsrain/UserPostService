@@ -1,10 +1,40 @@
 version: '3'
 services:
+  user-db:
+    image: postgres
+    volumes:
+      - user_db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: userdb
+    volumes:
+      - pgdata:/var/lib/mysql1/data
+  post-db:
+    image: postgres:latest
+    volumes:
+      - post_db:/    
+    ports:
+      - "5033:5033"
+    environment:
+      POSTGRES_USER: post
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postdb
+    volumes:
+      - pgdata:/var/lib/mysql1/data
   user-service:
     image: hollowsrain/user-service
     ports:
       - "8080:8080"
+    depends_on:
+      - user-db
   post-service:
     image: hollowsrain/post-service
     ports:
       - "8081:8081"
+    depends_on:
+      - post-db
+volumes:
+  pgdata:
