@@ -1,0 +1,10 @@
+version: '3'
+services:
+  user-service:
+    image: hollowsrain/user-service
+    ports:
+      - "8080:8080"
+  post-service:
+    image: hollowsrain/post-service
+    ports:
+      - "8081:8081"
