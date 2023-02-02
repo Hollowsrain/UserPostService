@@ -118,12 +118,17 @@ spec:
         ports:
         - containerPort: 5432
         volumeMounts:
-        - name: user-db-data
-          mountPath: /var/lib/postgresql/data
+        - mountPath: /PostgreSQL/15/data
+          name: user-db-data
+        - mountPath: /docker-entrypoint-initdb.d
+          name: user-initdb
       volumes:
       - name: user-db-data
         persistentVolumeClaim:
           claimName: user-db-volume-claim
+      - name: user-initdb
+        configMap:
+          name: user-db-init.sq
 ---
 #############Post database configuration
 apiVersion: v1
@@ -174,12 +179,17 @@ spec:
         ports:
         - containerPort: 5033
         volumeMounts:
-        - name: post-db-data
-          mountPath: /var/lib/postgresql/data
+        - mountPath: /PostgreSQL/15/data
+          name: post-db-data
+        - mountPath: /docker-entrypoint-initdb.d
+          name: post-initdb
       volumes:
       - name: post-db-data
         persistentVolumeClaim:
           claimName: post-db-volume-claim
+      - name: post-initdb
+        configMap:
+          name: post-db-init.sql
 ---
 #############User service configuration
 apiVersion: v1
