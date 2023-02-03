@@ -1,3 +1,39 @@
+#############User database persistentVolume configuration
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: user-db-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - docker-desktop
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: user-db-volume-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce 
+  resources:
+    requests:
+      storage: 1Gi
+---
 #############User database configuration
 apiVersion: v1
 kind: Service
