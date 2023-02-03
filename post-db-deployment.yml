@@ -1,0 +1,94 @@
+#############Post database persistentVolume configuration
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: post-db-pv-volume
+  namespace: k8s-program
+  labels:
+    type: local
+    app: post-db
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /mnt/data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: post-db-volume-claim
+  namespace: k8s-program
+  labels:
+    app: post-db
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+#############Post database configuration
+apiVersion: v1
+kind: Service
+metadata:
+  name: post-db
+  namespace: k8s-program
+spec:
+  selector:
+    app: post-db
+  ports:
+  - name: http
+    port: 5033
+    targetPort: 5033
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: post-db
+  namespace: k8s-program
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: post-db
+  template:
+    metadata:
+      labels:
+        app: post-db
+    spec:
+      containers:
+      - name: post-db
+        image: postgres
+        env:
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: POSTGRES_POST_DB_USERNAME
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: POSTGRES_POST_DB_PASSWORD
+        - name: POSTGRES_DB
+          value: postdb
+        ports:
+        - containerPort: 5033
+        volumeMounts:
+        - mountPath: /PostgreSQL/15/data
+          name: post-db-data
+        - mountPath: /docker-entrypoint-initdb.d
+          name: post-initdb
+      volumes:
+      - name: post-db-data
+        persistentVolumeClaim:
+          claimName: post-db-volume-claim
+      - name: post-initdb
+        configMap:
+          name: post-db-init.sql
+---

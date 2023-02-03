@@ -1,0 +1,67 @@
+#############User database configuration
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-db
+  namespace: k8s-program
+spec:
+  selector:
+    app: user-db
+  ports:
+  - name: http
+    port: 5432
+    targetPort: 5432
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-db
+  namespace: k8s-program
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-db
+  template:
+    metadata:
+      labels:
+        app: user-db
+    spec:
+      containers:
+      - name: user-db
+        image: postgres
+        env:
+        
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: POSTGRES_USER_DB_USERNAME
+        
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: POSTGRES_USER_DB_PASSWORD
+        
+        - name: POSTGRES_DB
+          value: userdb
+          
+        ports:
+        - containerPort: 5432
+        
+        volumeMounts:
+        - mountPath: /PostgreSQL/15/data
+          name: user-db-data
+        - mountPath: /docker-entrypoint-initdb.d
+          name: user-initdb
+      
+      volumes:
+      - name: user-db-data
+        persistentVolumeClaim:
+          claimName: user-db-volume-claim
+      - name: user-initdb
+        configMap:
+          name: user-db-init.sq
+---

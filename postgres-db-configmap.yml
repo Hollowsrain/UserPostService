@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: k8s-program
+---
+#############Config Maps configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-env-vars
+  namespace: k8s-program
+data:
+  POSTGRES_USER_DB: userdb
+  POSTGRES_POST_DB: postdb
+  POSTGRES_USER_DB_HOST: user-db
+  POSTGRES_POST_DB_HOST: post-db
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-sql-scripts
+  namespace: k8s-program
+data:
+  user-db-init.sql: |-
+    CREATE TABLE users (
+      id SERIAL PRIMARY KEY,
+      username VARCHAR(255) NOT NULL,
+      amount_of_posts bigint NOT NULL
+    );
+  post-db-init.sql: |-
+    CREATE TABLE posts (
+      id SERIAL PRIMARY KEY,
+      posted_at timestamp(6) without time zone NOT NULL,
+      text TEXT NOT NULL,
+      author_id INTEGER NOT NULL REFERENCES users(id)
+    );
+---

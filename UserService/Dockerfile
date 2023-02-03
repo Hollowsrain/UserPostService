@@ -5,7 +5,8 @@ ENV PATH=/opt/openjdk-17/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/
 ENV JAVA_VERSION=17.0.6_p10-r0
 ENV DB_USERNAME=user
 ENV DB_PASSWORD=password
-ENV DB_URL=jdbc:postgresql://user-db:5432/userdb
+ENV DB_HOST=user-db
+ENV POSTGRES_DB_NAME=userdb
 EXPOSE 8080
 ADD target/user-service-1.jar user-service-1.jar
-ENTRYPOINT ["java", "-jar", "/user-service-1.jar","-web -webAllowOthers -tcp -tcpAllowOthers -browser --DB_USERNAME=user --DB_PASSWORD=password --USER_SERVICE_URL=http://user-service:8080/users/ --DB_URL=jdbc:postgresql://user-db:5432/userdb"]
+ENTRYPOINT ["java", "-jar", "/user-service-1.jar","--DB_USERNAME=user --DB_PASSWORD=password --USER_SERVICE_URL=http://user-service:8080/users/ --DB_URL=jdbc:postgresql://user-db:5432/userdb"]

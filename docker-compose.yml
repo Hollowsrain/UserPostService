@@ -13,11 +13,11 @@ services:
     volumes:
       - pgdata:/var/lib/mysql1/data
   post-db:
-    image: postgres:latest
+    image: postgres
     volumes:
       - post_db:/    
     ports:
-      - "5033:5033"
+      - "5433:5433"
     environment:
       POSTGRES_USER: post
       POSTGRES_PASSWORD: password

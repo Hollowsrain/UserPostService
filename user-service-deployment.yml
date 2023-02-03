@@ -1,0 +1,60 @@
+#############User service configuration
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: k8s-program
+spec:
+  selector:
+    app: user-service
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+      - name: user-service
+        image: hollowsrain/user-service
+        ports:
+          - containerPort: 8080
+        
+        env:
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: POSTGRES_USER_DB_USERNAME
+              
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: POSTGRES_USER_DB_PASSWORD
+              
+        - name: POSTGRES_DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: app-env-vars
+              key: POSTGRES_USER_DB
+
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: app-env-vars
+              key: POSTGRES_USER_DB_HOST
+---
